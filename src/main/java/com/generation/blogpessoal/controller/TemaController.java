@@ -68,7 +68,7 @@ public class TemaController {
 		Optional<Tema> tema = temaRepository.findById(id);
 		
 		if(tema.isEmpty())
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND); 
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND); //oiooio
 		
 		temaRepository.deleteById(id);
 	}
