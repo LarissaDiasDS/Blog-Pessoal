@@ -52,15 +52,12 @@ public class BasicSecurityConfig {
     
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-
-        http
-                .sessionManagement()
+              http.sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and().csrf().disable()
-                .cors();
+                .and().csrf().disable().cors();
 
-        http
-                .authorizeHttpRequests((auth) -> auth
+        
+                http.authorizeHttpRequests((auth) -> auth
                         .requestMatchers("/usuarios/logar").permitAll()
                         .requestMatchers("/usuarios/cadastrar").permitAll()
                         .requestMatchers("/error/**").permitAll()
