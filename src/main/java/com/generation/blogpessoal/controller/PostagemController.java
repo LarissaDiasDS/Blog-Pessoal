@@ -1,6 +1,6 @@
 package com.generation.blogpessoal.controller;
 
-import java.util.List;
+import java.util.List; 
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +20,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.generation.blogpessoal.model.Postagens;
 import com.generation.blogpessoal.repository.PostagemRepository;
+import com.generation.blogpessoal.repository.TemaRepository;
 
 import jakarta.validation.Valid;
 
@@ -30,6 +31,9 @@ public class PostagemController <Postagem>{
 	
 	@Autowired
 	private PostagemRepository postagemRepository;
+	
+	@Autowired
+    public TemaRepository temaRepository;
 	
 	@GetMapping
 	public ResponseEntity<List<Postagens>> getAll() {
@@ -49,18 +53,26 @@ public class PostagemController <Postagem>{
 	}
 	
 	@PostMapping
-	public ResponseEntity<Postagens> post (@Valid @RequestBody Postagens postagens){
-		return ResponseEntity.status(HttpStatus.CREATED)
-				.body(postagemRepository.save(postagens));
-	}
+    public ResponseEntity<Postagens> post(@Valid @RequestBody Postagens postagens) {
+            if (temaRepository.existsById(postagens.getTema().getId())) {
+                return ResponseEntity.status(HttpStatus.CREATED)
+                        .body(postagemRepository.save(postagens));
+            }
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tema não existe!", null);
+        }
 	
 	@PutMapping
-	public ResponseEntity<Postagens> put(@Valid @RequestBody Postagens postagens){
-		return postagemRepository.findById(postagens.getId())
-				.map(resposta -> ResponseEntity.status(HttpStatus.OK)
-						.body(postagemRepository.save(postagens)))
-				.orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
-	}
+    public ResponseEntity<Postagens> put(@Valid @RequestBody Postagens postagens) {
+        if (postagemRepository.existsById(postagens.getId())) {
+
+            if (temaRepository.existsById(postagens.getTema().getId())) {
+                return ResponseEntity.status(HttpStatus.OK)
+                        .body(postagemRepository.save(postagens));
+            }
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tema não existe!", null);
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
 	
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	@DeleteMapping("/{id}")
